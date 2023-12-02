@@ -18,8 +18,6 @@ public class Token
     public static void GenerateUserToken(User? user)
     {
         Token? token = new Token(Guid.NewGuid().ToString(), user);
-        // TODO -> REMOVE DEBUG
-        Console.WriteLine($"TOKEN CREATED: {token.TokenId} {token.User.Username}");
         Tokens.Add(token);
     }
 

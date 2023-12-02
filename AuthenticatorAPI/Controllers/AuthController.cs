@@ -29,9 +29,6 @@ public class AuthController : ControllerBase
                 //I Generate a fake nonce to avoid exposing users
                 Random rnd = new Random(DateTime.Now.Millisecond);
                 int random = rnd.Next(0, Int32.MaxValue);
-
-                //TODO - Remove Debug
-                return Ok(random+" DEBUG: USER NOT PRESENT");
         }
 
         return Ok(user.GenerateUserNonce());
