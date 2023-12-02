@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthenticatorAPI", "AuthenticatorAPI\AuthenticatorAPI.csproj", "{57C9B2B2-A9DF-4ACE-B92F-01710715E4D4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileManager", "FileManager\FileManager.csproj", "{35DEA6C9-B4A5-48BC-8853-8EA27A39BEF8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{57C9B2B2-A9DF-4ACE-B92F-01710715E4D4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{57C9B2B2-A9DF-4ACE-B92F-01710715E4D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{57C9B2B2-A9DF-4ACE-B92F-01710715E4D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{57C9B2B2-A9DF-4ACE-B92F-01710715E4D4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{35DEA6C9-B4A5-48BC-8853-8EA27A39BEF8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{35DEA6C9-B4A5-48BC-8853-8EA27A39BEF8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{35DEA6C9-B4A5-48BC-8853-8EA27A39BEF8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{35DEA6C9-B4A5-48BC-8853-8EA27A39BEF8}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
