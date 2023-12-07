@@ -21,7 +21,7 @@ public class UserManager : IListManager<List<User>>
     {
         _fileManager.SaveToFile(fileName, users);
     }
-    
+
     public void UpdateJsons()
     {
         SaveNewList?.Invoke(_fileName, _userList);
@@ -36,6 +36,7 @@ public class UserManager : IListManager<List<User>>
     {
         if (_userList.FirstOrDefault(u => u.Email == user.Email) == null)
         {
+            user.HashOwnPassword();
             _userList.Add(user);
             UpdateJsons();
             return true;
@@ -44,7 +45,7 @@ public class UserManager : IListManager<List<User>>
         return false;
     }
 
-    public User?GetById(string email)
+    public User? GetById(string email)
     {
         return _userList.FirstOrDefault(u => u.Email == email);
     }

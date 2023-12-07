@@ -6,18 +6,17 @@ namespace AuthenticatorAPI.Models;
 
 public class User
 {
-    
     public string Username { get; set; }
     public string Email { get; private set; }
-    
+
     [JsonProperty]
     private string Password { get; set; }
+
     [JsonIgnore]
     private string? Nonce { get; set; }
 
-
     [JsonConstructor]
-    public User(string username ,string email, string password)
+    public User(string username, string email, string password)
     {
         Username = username;
         Email = email;
@@ -26,28 +25,29 @@ public class User
 
     public string GenerateUserNonce()
     {
-        Random rnd = new Random(DateTime.Now.Millisecond);
-        long random = rnd.NextInt64(0, Int32.MaxValue);
+        Random rnd = new(DateTime.Now.Millisecond);
+        long random = rnd.NextInt64(0, int.MaxValue);
 
         random = Password.Length * Email.Length + random;
 
         Nonce = ComputeSha256Hash(random.ToString());
+        Console.WriteLine("DEBUG: USE THIS TO LOGIN -> " + Nonce + Password);
         return Nonce;
     }
 
-    public bool CheckUserCredentials(User? user, string password)
+    public Token? CheckUserCredentials(User user, string password)
     {
         password = password.Replace(Nonce!, string.Empty);
         if (password.Equals(user.Password))
         {
-            Token.GenerateUserToken(user);
-            return true;
+            Nonce = "";
+            return Token.GenerateUserToken(user);
         }
-        return false;
+        Nonce = "";
+        return null;
     }
 
-
-    public string ComputeSha256Hash(string rawData)
+    public static string ComputeSha256Hash(string rawData)
     {
         using SHA256 sha256Hash = SHA256.Create();
         byte[] bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(rawData));

@@ -1,14 +1,20 @@
-using AuthenticatorAPI.Data;
+using GameAPI.GameManagerD;
+using GameAPI.Helpers;
+using PokerLibrary.Interfaces;
+using PokerLibrary.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddControllers();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddSingleton(new UserManager());
+builder.Services.AddScoped<IGame, Game>();
+builder.Services.AddSingleton<GameManager>();
+builder.Services.AddSingleton<ScoreboardManager>();
 
 var app = builder.Build();
 

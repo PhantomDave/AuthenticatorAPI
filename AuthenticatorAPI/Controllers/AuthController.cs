@@ -1,15 +1,17 @@
-using AuthenticatorAPI.Data;
+using System.Text.RegularExpressions;
 using AuthenticatorAPI.DTOs;
+using AuthenticatorAPI.Data;
 using AuthenticatorAPI.Models;
+using AuthenticatorAPI.Regexs;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace AuthenticatorAPI.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class AuthController : ControllerBase
+public partial class AuthController : ControllerBase
 {
-
     private readonly ILogger<AuthController> _logger;
     private readonly UserManager _userManager;
 
@@ -23,41 +25,53 @@ public class AuthController : ControllerBase
     [Route("/login/{email}")]
     public ActionResult UserExsists(string email)
     {
-        User? user = _userManager.GetById(email);
+        User user = _userManager.GetById(email)!;
         if (user is null)
         {
-                //I Generate a fake nonce to avoid exposing users
-                Random rnd = new Random(DateTime.Now.Millisecond);
-                int random = rnd.Next(0, Int32.MaxValue);
+            //I Generate a fake nonce to avoid exposing users
+            Random rnd = new Random(DateTime.Now.Millisecond);
+            int random = rnd.Next(0, int.MaxValue);
+            return Ok(Models.User.ComputeSha256Hash(random.ToString()));
         }
 
-        return Ok(user.GenerateUserNonce());
+        return Ok(user!.GenerateUserNonce());
     }
 
     [HttpPost]
     [Route("/login/")]
-    public ActionResult CheckUserLogin([FromBody]UserDto userDto)
+    public ActionResult CheckUserLogin([FromBody] UserDto userDto)
     {
-        User? user = _userManager.GetById(userDto.Email);
+        User user = _userManager.GetById(userDto.Email!)!;
         if (user is null)
         {
             return NotFound("Invalid Credentials");
         }
 
-        if (user.CheckUserCredentials(user, userDto.Password))
+        Token? token = user.CheckUserCredentials(user, userDto.Password!);
+        if (token != null)
         {
-            return Ok(user);
+            dynamic dynamicSerialize = new { dtoken = token.TokenGuid, duser = user };
+
+            return Ok(JsonConvert.SerializeObject(dynamicSerialize));
         }
         return NotFound("Invalid Credentials");
-        
     }
 
     [HttpPost]
     [Route("/register/")]
     public ActionResult RegisterUser([FromBody] RegistrationDto registrationDto)
     {
-        User user = new User(registrationDto.Username!, registrationDto.Email!, registrationDto.Password!);
-        user.HashOwnPassword();
+        User user = new User(
+            registrationDto.Username!,
+            registrationDto.Email!,
+            registrationDto.Password!
+        );
+
+        if (!Rgex.EmailRegex().IsMatch(user.Email))
+        {
+            return BadRequest("Invalid Email");
+        }
+
         if (_userManager.AddToList(user))
         {
             return Ok("User Created");
@@ -70,38 +84,20 @@ public class AuthController : ControllerBase
     [Route("/checkauth/")]
     public ActionResult CheckUserAuthentication([FromQuery] string token)
     {
-
         try
         {
-            Token? tok = Token.GetUserTupleFromToken(token);
+            Token? tok = Token.GetTokenFromTokenId(token);
 
             if (tok is null)
                 return Unauthorized();
-            
-            if (tok.IsUserTokenValid(tok.User))
+            if (tok.IsUserTokenValid(tok))
                 return Ok();
             return Unauthorized();
-        
         }
         catch (Exception e)
         {
             Console.WriteLine(e);
             return Unauthorized("Unauthorized from Catch");
         }
-        /*User? user = Token.GetUserFromToken(token);
-        if (user is null)
-            return Unauthorized();
-        Token? userToken = Token.GetTokenFromUser(user);
-
-        if (userToken is null)
-            return Unauthorized();
-
-        if (!userToken.IsUserTokenValid(user))
-            return Unauthorized();
-
-        return Ok();*/
-
     }
-    
-    
 }

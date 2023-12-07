@@ -1,0 +1,146 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using PokerLibrary.Enums;
+
+namespace PokerLibrary.Models
+{
+    public class Player
+    {
+        public string Name { get; private set; }
+        public string Email { get; private set; }
+        public List<Card> Hand { get; private set; }
+        public int Chips { get; private set; }
+        public int Bet { get; private set; }
+        public NextMove Move { get; private set; }
+        public PlayerRole CurrentRole { get; private set; } = PlayerRole.None;
+        public int HandValue { get; private set; }
+
+        public Player(string email, int chips)
+        {
+            Name = "NOPLS";
+            Email = email;
+            Hand = new List<Card>();
+            Chips = chips;
+        }
+
+        public void SetChips(int chips)
+        {
+            Chips = chips;
+        }
+
+        public void SetUsername(string name)
+        {
+            Name = name;
+        }
+
+        public void ResetMoveOfPlayer(Player p)
+        {
+            p.Move = NextMove.None;
+        }
+
+        //TODO: Improve calculation of Hand value by taking in consideration the card Value like i do in the "Poker Hand" section
+        public void CalculateHandValue(List<Card> tableCards)
+        {
+            List<Card> totalCards = new List<Card>();
+            totalCards.AddRange(tableCards);
+            totalCards.AddRange(Hand);
+            Suits[] suits = totalCards.Select(c => c.suit).Distinct().ToArray();
+            CardValue[] seq = totalCards.Select(c => c.value).OrderBy(s => s).ToArray();
+            CardValue[] Poker = seq.GroupBy(c => c)
+                .Where(n => n.Count() == 4)
+                .Select(p => p.First())
+                .ToArray();
+            CardValue[] Tris = seq.GroupBy(c => c)
+                .Where(n => n.Count() == 3)
+                .Select(p => p.First())
+                .ToArray();
+            CardValue[] Pair = seq.GroupBy(c => c)
+                .Where(n => n.Count() == 2)
+                .Select(p => p.First())
+                .ToArray();
+
+            if (suits.Length == 1)
+            {
+                if (seq.Zip(seq.Skip(1), (a, b) => (a + 1) == b).All(x => x))
+                {
+                    if (seq[0] == CardValue.Ten && seq[4] == CardValue.Ace)
+                    {
+                        HandValue = 500;
+                        return;
+                    }
+                    HandValue = 100;
+                    return;
+                }
+            }
+            if (Poker.Length > 0)
+            {
+                if (
+                    Poker.Contains(CardValue.Ten)
+                    || Poker.Contains(CardValue.Jack)
+                    || Poker.Contains(CardValue.Queen)
+                    || Poker.Contains(CardValue.King)
+                    || Poker.Contains(CardValue.Ace)
+                )
+                {
+                    HandValue = 80;
+                    return;
+                }
+                HandValue = 60;
+                return;
+            }
+            if (Tris.Length > 0 && Pair.Length > 0)
+            {
+                //KIASTOFUL
+                HandValue = 70;
+                return;
+            }
+            if (Tris.Length > 0)
+            {
+                HandValue = 50;
+                return;
+            }
+            if (Pair.Length > 1)
+            {
+                HandValue = 30;
+                return;
+            }
+            if (Pair.Length > 0 && Pair.Length < 1)
+            {
+                HandValue = 15;
+                return;
+            }
+            HandValue = (int)totalCards.MaxBy(c => (int)c.value)!.value;
+        }
+
+        public void PrepareMove(NextMove move, int bet = 0, bool forced = false)
+        {
+            if (Chips < bet && forced && move == NextMove.Bet)
+                move = NextMove.AllIn;
+
+            if (move == NextMove.Bet)
+            {
+                Bet = bet;
+                Chips -= bet;
+            }
+            if (move == NextMove.AllIn)
+            {
+                Bet = Chips;
+                Chips = 0;
+            }
+            Move = move;
+        }
+
+        public void GivePlayerChips(int pot)
+        {
+            Chips += pot;
+        }
+
+        public void SetRole(PlayerRole role)
+        {
+            CurrentRole = role;
+        }
+    }
+}
