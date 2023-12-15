@@ -1,5 +1,6 @@
 using GameAPI.GameManagerD;
 using GameAPI.Helpers;
+using GameManagerD;
 using PokerLibrary.Interfaces;
 using PokerLibrary.Models;
 
@@ -12,7 +13,7 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddScoped<IGame, Game>();
+builder.Services.AddSingleton<MatchManager>();
 builder.Services.AddSingleton<GameManager>();
 builder.Services.AddSingleton<ScoreboardManager>();
 
@@ -25,7 +26,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+app.UseCors(op => op.AllowAnyHeader().AllowAnyHeader().AllowAnyOrigin());
 
 app.UseAuthorization();
 

@@ -38,6 +38,7 @@ public class User
     public Token? CheckUserCredentials(User user, string password)
     {
         password = password.Replace(Nonce!, string.Empty);
+        password = ComputeSha256Hash(password);
         if (password.Equals(user.Password))
         {
             Nonce = "";

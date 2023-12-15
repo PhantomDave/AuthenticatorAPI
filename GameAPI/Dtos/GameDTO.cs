@@ -1,14 +1,16 @@
-using PokerLibrary.Enums;
+﻿using PokerLibrary.Enums;
 using PokerLibrary.Models;
 
-namespace GameAPI.DTOs;
-
-public class GameDTO
+namespace GameAPI.Dtos
 {
-    public Deck Deck { get; set; }
-    public int Pot { get; set; }
-    public List<Player> Players { get; set; }
-    public GameStage CurrentStage { get; set; }
-    public int[] Blinds { get; set; }
-    public List<Card> TableCards { get; set; }
+    public struct GameDTO
+    {
+        public int Pot { get; init; }
+        public Player Player { get; set; }
+        public List<OpponentDTO> Opponents {get; set; }
+        public GameStage CurrentStage { get; init; }
+        public int[]? Blinds { get; init; }
+        public List<Card>? TableCards { get; init; }
+        public dynamic? LastRoundWinner { get; init; }
+    }
 }

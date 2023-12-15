@@ -49,9 +49,10 @@ public class ScoreboardManager : IListManager<List<Scoreboard>>
         SaveNewList?.Invoke(FileName, ScoreboardList);
     }
 
-    public static void AddToList(Scoreboard scoreboard)
+    public void AddToList(Scoreboard scoreboard)
     {
         Scoreboard? sc = ScoreboardList.FirstOrDefault(s => s.Email == scoreboard.Email);
+        Console.WriteLine($"ADDING TO SCOREBOARD: {scoreboard.Email} {sc is null}");
         if (sc == null)
         {
             ScoreboardList.Add(scoreboard);
@@ -60,5 +61,6 @@ public class ScoreboardManager : IListManager<List<Scoreboard>>
         {
             sc.SumScores(scoreboard);
         }
+        UpdateJsons();
     }
 }

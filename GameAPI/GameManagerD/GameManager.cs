@@ -4,12 +4,12 @@ using Project8.FileManager;
 
 namespace GameAPI.GameManagerD;
 
-public class GameManager : IListManager<Dictionary<string, GameDTO>>
+public class GameManager : IListManager<Dictionary<string, Game>>
 {
-    public static Dictionary<string, GameDTO> Games = new();
-    private static event FileManager<Dictionary<string, GameDTO>>.SaveToFileDelegate? SaveNewList;
+    public static Dictionary<string, Game> Games = new();
+    private static event FileManager<Dictionary<string, Game>>.SaveToFileDelegate? SaveNewList;
     private static string FileName = "Games.json";
-    private static readonly FileManager<Dictionary<string, GameDTO>> fileManager = new();
+    private static readonly FileManager<Dictionary<string, Game>> fileManager = new();
 
     private static object _istanceLock = new();
     private static GameManager? _instance = null;
@@ -42,7 +42,7 @@ public class GameManager : IListManager<Dictionary<string, GameDTO>>
         Games = await fileManager.LoadFromFile(FileName) ?? new();
     }
 
-    public void SaveToFile(string filename, Dictionary<string, GameDTO> game)
+    public void SaveToFile(string filename, Dictionary<string, Game> game)
     {
         fileManager.SaveToFile(filename, game);
     }
@@ -52,16 +52,28 @@ public class GameManager : IListManager<Dictionary<string, GameDTO>>
         SaveNewList?.Invoke(FileName, Games);
     }
 
-    public GameDTO? FindGame(string email)
+    public Game? FindGame(string email)
     {
-        Games.TryGetValue(email, out GameDTO? game);
+        Games.TryGetValue(email, out Game? game);
         return game;
     }
 
-    public bool AddGameToList(GameDTO gameDTO)
+    public bool AddGameToList(Game gameDTO)
     {
         if (Games.TryAdd(gameDTO.Players[0].Email, gameDTO))
         {
+            UpdateJsons();
+            return true;
+        }
+        return false;
+    }
+
+    
+    public bool RemoveGameToList(string mail) 
+    {
+        if(Games.Remove(mail)) 
+        {
+            UpdateJsons();
             return true;
         }
         return false;

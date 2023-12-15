@@ -1,9 +1,11 @@
 ﻿using PokerLibrary.Enums;
+using Newtonsoft.Json;
 
 namespace PokerLibrary.Models
 {
     public class AIPlayer : Player
     {
+        [JsonProperty]
         public AIPersonality AIPersonality { get; private set; }
         public static string[] Usernames = new string[]
         {
@@ -22,6 +24,13 @@ namespace PokerLibrary.Models
             "Simone",
             "Buongiooornooo"
         };
+        
+        [JsonConstructor]
+        public AIPlayer(string Name, string Email, List<Card> Hand, int Chips, int Bet, NextMove Move, PlayerRole CurrentRole, int HandValue, AIPersonality AIPersonality)
+            : base(Name, Email, Hand, Chips, Bet, Move, CurrentRole, HandValue)
+        {
+            this.AIPersonality = AIPersonality;
+        }
 
         public AIPlayer(int chips)
             : base("", chips)
@@ -35,50 +44,62 @@ namespace PokerLibrary.Models
 
         public void CalculateNextMove(Game currentGame)
         {
-            List<Card> cards = new();
-            cards.AddRange(Hand);
-            cards.AddRange(currentGame.TableCards);
-            CalculateHandValue(cards);
-            int personalityAndRandomValue = CalculatePersonalityAndRandom();
-            int moveRiskValue = CalculateRiskOfMove(currentGame);
-            int RiskValue = personalityAndRandomValue + moveRiskValue - HandValue;
-            //TODO: REMOVE DEBUG:
-
-            Console.WriteLine(
-                $"Personality and Random: {personalityAndRandomValue} MOVE RISK; {moveRiskValue}, RISKVALUE: {RiskValue}"
-            );
-
-            Random random = new Random();
-            if (RiskValue == 0)
-                RiskValue = 10;
-            int rnd = random.Next(0, RiskValue);
-
-            if (HandValue > 500)
+            try
             {
-                PrepareMove(NextMove.AllIn);
-                return;
-            }
+                if (Move == NextMove.Fold  || Move == NextMove.AllIn)
+                    return;
 
-            if (RiskValue >= 100)
-            {
-                if (currentGame.CanCheck())
+                List<Card> cards = new();
+                cards.AddRange(Hand);
+                cards.AddRange(currentGame.TableCards);
+                CalculateHandValue(cards);
+                int personalityAndRandomValue = CalculatePersonalityAndRandom();
+                int moveRiskValue = CalculateRiskOfMove(currentGame);
+                int RiskValue = personalityAndRandomValue + moveRiskValue - HandValue;
+                //TODO: REMOVE DEBUG:
+
+                Console.WriteLine(
+                    $"Personality and Random: {personalityAndRandomValue} MOVE RISK; {moveRiskValue}, RISKVALUE: {RiskValue}"
+                );
+
+                Random random = new Random();
+                int rnd = 0;
+                if (RiskValue > 0)
+                    rnd = random.Next(0, RiskValue);
+
+                if (HandValue > 500)
                 {
-                    PrepareMove(NextMove.Check);
+                    PrepareMove(NextMove.AllIn);
                     return;
                 }
-                PrepareMove(NextMove.Fold);
-                return;
-            }
-            if (RiskValue >= 50 && RiskValue <= 75)
-            {
-                PrepareMove(NextMove.Check, RiskValue);
-                return;
-            }
 
-            if (RiskValue <= 50)
+                if (RiskValue >= 100)
+                {
+                    if (currentGame.CanCheck())
+                    {
+                        PrepareMove(NextMove.Check);
+                        return;
+                    }
+                    PrepareMove(NextMove.Fold);
+                    return;
+                }
+                if (RiskValue >= 35 && RiskValue <= 75 && currentGame.CanCheck())
+                {
+                    PrepareMove(NextMove.Check, RiskValue);
+                    return;
+                }
+
+                if (RiskValue <= 35)
+                {
+                    PrepareMove(NextMove.Bet, RiskValue + rnd);
+                    currentGame.AddToPot(RiskValue + rnd);
+                    return;
+                }
+            }
+            catch (Exception ex)
             {
-                PrepareMove(NextMove.Bet, RiskValue + rnd);
-                return;
+                PrepareMove(NextMove.Fold);
+                Console.WriteLine("ERROR IN CALCULATE MOVE " + ex.StackTrace);
             }
         }
 

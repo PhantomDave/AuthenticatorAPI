@@ -1,4 +1,3 @@
-using System.Text.RegularExpressions;
 using AuthenticatorAPI.DTOs;
 using AuthenticatorAPI.Data;
 using AuthenticatorAPI.Models;
@@ -50,7 +49,11 @@ public partial class AuthController : ControllerBase
         Token? token = user.CheckUserCredentials(user, userDto.Password!);
         if (token != null)
         {
-            dynamic dynamicSerialize = new { dtoken = token.TokenGuid, duser = user };
+            dynamic dynamicSerialize = new
+            {
+                dtoken = token.TokenGuid,
+                duser = new { username = user.Username, email = user.Email },
+            };
 
             return Ok(JsonConvert.SerializeObject(dynamicSerialize));
         }

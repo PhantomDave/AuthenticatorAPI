@@ -27,7 +27,10 @@ namespace Project8.FileManager
                 {
                     return default;
                 }
-                T val = JsonConvert.DeserializeObject<T>(fileString);
+                T val = JsonConvert.DeserializeObject<T>(fileString, new JsonSerializerSettings
+                {
+                    TypeNameHandling = TypeNameHandling.Auto
+                });
                 reader.Dispose();
                 fs.Dispose();
                 retry = 0;
@@ -58,7 +61,11 @@ namespace Project8.FileManager
                 using (FileStream fs = new FileStream(path, FileMode.OpenOrCreate, FileAccess.Write, FileShare.Read))
                 {
                     fs.SetLength(0);
-                    byte[] bytes = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(newlist, Formatting.Indented));
+                    byte[] bytes = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(newlist, new JsonSerializerSettings
+                    {
+                        Formatting = Formatting.Indented,
+                        TypeNameHandling = TypeNameHandling.All,
+                    }));
                     await fs.WriteAsync(bytes);
                     await fs.FlushAsync();
 

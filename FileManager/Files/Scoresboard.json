@@ -1,0 +1,47 @@
+{
+  "$type": "System.Collections.Generic.List`1[[PokerLibrary.Models.Scoreboard, PokerLibrary]], System.Private.CoreLib",
+  "$values": [
+    {
+      "$type": "PokerLibrary.Models.Scoreboard, PokerLibrary",
+      "Email": "test1@gmail.com",
+      "ChipsWon": 5000,
+      "PlayersKnockedOut": 15,
+      "TablesWon": 10
+    },
+    {
+      "$type": "PokerLibrary.Models.Scoreboard, PokerLibrary",
+      "Email": "test2@gmail.com",
+      "ChipsWon": 15000,
+      "PlayersKnockedOut": 25,
+      "TablesWon": 10
+    },
+    {
+      "$type": "PokerLibrary.Models.Scoreboard, PokerLibrary",
+      "Email": "test3@gmail.com",
+      "ChipsWon": 25000,
+      "PlayersKnockedOut": 35,
+      "TablesWon": 10
+    },
+    {
+      "$type": "PokerLibrary.Models.Scoreboard, PokerLibrary",
+      "Email": "test4@gmail.com",
+      "ChipsWon": 35000,
+      "PlayersKnockedOut": 45,
+      "TablesWon": 10
+    },
+    {
+      "$type": "PokerLibrary.Models.Scoreboard, PokerLibrary",
+      "Email": "test5@gmail.com",
+      "ChipsWon": 45000,
+      "PlayersKnockedOut": 55,
+      "TablesWon": 10
+    },
+    {
+      "$type": "PokerLibrary.Models.Scoreboard, PokerLibrary",
+      "Email": "dave@dave.it",
+      "ChipsWon": 4022,
+      "PlayersKnockedOut": 36,
+      "TablesWon": 0
+    }
+  ]
+}

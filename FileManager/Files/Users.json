@@ -1,7 +1,41 @@
-[
-  {
-    "Username": "Dave",
-    "Email": "dave@dave.it",
-    "Password": "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918"
-  }
-]
+{
+  "$type": "System.Collections.Generic.List`1[[AuthenticatorAPI.Models.User, AuthenticatorAPI]], System.Private.CoreLib",
+  "$values": [
+    {
+      "$type": "AuthenticatorAPI.Models.User, AuthenticatorAPI",
+      "Username": "Dave",
+      "Email": "dave@dave.it",
+      "Password": "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918"
+    },
+    {
+      "$type": "AuthenticatorAPI.Models.User, AuthenticatorAPI",
+      "Username": "Michele",
+      "Email": "mmalgeri@unict.it",
+      "Password": "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918"
+    },
+    {
+      "$type": "AuthenticatorAPI.Models.User, AuthenticatorAPI",
+      "Username": "Davide1",
+      "Email": "davidebrancato@gmail.com",
+      "Password": "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918"
+    },
+    {
+      "$type": "AuthenticatorAPI.Models.User, AuthenticatorAPI",
+      "Username": "Martina",
+      "Email": "martinabentivegna@gmail.com",
+      "Password": "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918"
+    },
+    {
+      "$type": "AuthenticatorAPI.Models.User, AuthenticatorAPI",
+      "Username": "Samuele",
+      "Email": "samuelespina@gmail.com",
+      "Password": "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918"
+    },
+    {
+      "$type": "AuthenticatorAPI.Models.User, AuthenticatorAPI",
+      "Username": "Rohan",
+      "Email": "rohanbahadoor@gmail.com",
+      "Password": "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918"
+    }
+  ]
+}

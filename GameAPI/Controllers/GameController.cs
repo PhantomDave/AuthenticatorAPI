@@ -1,12 +1,11 @@
-﻿using System.Runtime.CompilerServices;
-using System.Text.Json;
+﻿using GameAPI.Dtos;
 using GameAPI.DTOs;
 using GameAPI.GameManagerD;
 using GameAPI.Helpers;
+using GameManagerD;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using PokerLibrary.Enums;
-using PokerLibrary.Interfaces;
 using PokerLibrary.Models;
 
 namespace GameAPI.Controllers
@@ -17,16 +16,17 @@ namespace GameAPI.Controllers
         private readonly HttpHelper _httpHelper = new HttpHelper("https://localhost:7245");
         private readonly GameManager _gameManager;
         private readonly ScoreboardManager _scoreboardManager;
-        private readonly IGame _game;
+
+        private readonly MatchManager _matchManager;
 
         public GameController(
             GameManager gameManager,
-            IGame game,
+            MatchManager matchManager,
             ScoreboardManager scoreboardManager
         )
         {
             _gameManager = gameManager;
-            _game = game;
+            _matchManager = matchManager;
             _scoreboardManager = scoreboardManager;
         }
 
@@ -48,7 +48,9 @@ namespace GameAPI.Controllers
                 return NotFound(JsonConvert.SerializeObject("Invalid Credentials"));
             }
 
+            Game? _game = _matchManager.GetGame(user.Email!) ?? new Game();
             _game.AddPlayerToGame(new Player(user.Email!, 0));
+            _matchManager.AddGameToManager(_game, user.Email!);
             return Ok(userTok);
         }
 
@@ -56,6 +58,7 @@ namespace GameAPI.Controllers
         [Route("/game/setusername/")]
         public async Task<IActionResult> SetUsername(
             [FromQuery] string token,
+            [FromQuery] string email,
             [FromQuery] string username
         )
         {
@@ -64,7 +67,10 @@ namespace GameAPI.Controllers
                 if (!await _httpHelper.IsUserAuthenticatedAsync(token))
                     return Unauthorized();
 
-                Player player = _game.Players[0];
+                Game? _game = _matchManager.GetGame(email);
+                if (_game.Players.Count == 0)
+                    _game.AddPlayerToGame(new Player(email, 0));
+                Player player = _game!.Players[0];
                 player.SetUsername(username);
                 return Ok();
             }
@@ -78,18 +84,27 @@ namespace GameAPI.Controllers
         [Route("/game/start/{numplayer}/{smallblind}/{bigblind}/{chips}")]
         public async Task<IActionResult> StartGame(
             [FromQuery] string token,
+            [FromQuery] string email,
             int numplayer,
             int smallblind,
             int bigblind,
             int chips
         )
         {
+            Game _game = _matchManager.GetGame(email)!;
+
+            _game ??= new Game();
+
             if (_game.Started)
-                return BadRequest("Game has started");
+            {
+                _matchManager.RemoveGame(email);
+                _game = _game.ResetGame();
+                _matchManager.AddGameToManager(_game, email);
+            }
 
             if (numplayer > 5)
             {
-                return BadRequest(JsonConvert.SerializeObject("Maxinum Number of player is 5"));
+                return BadRequest(JsonConvert.SerializeObject("Maximum Number of player is 5"));
             }
 
             if (!await _httpHelper.IsUserAuthenticatedAsync(token))
@@ -99,27 +114,77 @@ namespace GameAPI.Controllers
             _game.Players.First().SetChips(chips);
             _game.SetupAIPlayers(numplayer, chips);
             _game.StartGame();
-            return Ok(JsonConvert.SerializeObject(GenerateDTO()));
+            _game.AdvanceGame();
+            return Ok(JsonConvert.SerializeObject(GenerateGameDTO(_game)));
+        }
+
+        [HttpGet]
+        [Route("/game/getsavedgame")]
+        public async Task<IActionResult> GetSavedGame([FromQuery] string email, [FromQuery] string token)
+        {
+            if (!await _httpHelper.IsUserAuthenticatedAsync(token))
+                return Unauthorized();
+
+            Game? _game = _gameManager.FindGame(email);
+            if (_game is null) return Ok();
+            if (!_game.Started)
+                return Ok();
+            if (_matchManager.GetGame(email) != null)
+            {
+                _matchManager.RemoveGame(email);
+            }
+
+            _matchManager.AddGameToManager(_game, email);
+
+            return Ok(JsonConvert.SerializeObject(GenerateGameDTO(_game)));
+        }
+
+        [HttpGet]
+        [Route("/game/clearSavedGame")]
+        public async Task<IActionResult> ClearSavedGame([FromQuery] string email, [FromQuery] string token)
+        {
+            if (!await _httpHelper.IsUserAuthenticatedAsync(token))
+                return Unauthorized();
+
+            Game? _game = _gameManager.FindGame(email);
+            if (_game is null) return Ok();
+
+            if (_matchManager.GetGame(email) != null)
+            {
+                _matchManager.RemoveGame(email);
+            }
+
+            if (_gameManager.RemoveGameToList(email))
+                return Ok();
+
+            return BadRequest();
         }
 
         [HttpGet]
         [Route("/game/move/")]
         public ActionResult MakePlayerMove(
+            [FromQuery] string email,
             [FromQuery] int move,
-            [FromQuery] int id,
             [FromQuery] int bet
         )
         {
             try
             {
+                Game _game = _matchManager.GetGame(email)!;
                 //this returns the next player in the turn
-                Player player = _game.Players[id];
+                Player player = _game.Players[0];
+
 
                 player.PrepareMove((NextMove)move, bet);
 
-                Player nextPlayer = _game.GetNextPlayerInTurn(player);
+                if ((NextMove)move == NextMove.Bet)
+                {
+                    _game.AddToPot(bet);
+                }
 
-                return Ok(JsonConvert.SerializeObject(nextPlayer));
+                // Player nextPlayer = _game.GetNextPlayerInTurn(player);
+
+                return Ok(JsonConvert.SerializeObject(player));
             }
             catch (Exception ex)
             {
@@ -128,26 +193,58 @@ namespace GameAPI.Controllers
         }
 
         [HttpGet]
-        [Route("/game/advance")]
-        public ActionResult AdvanceGame()
+        [Route("/game/getaimove")]
+        public ActionResult MakeAIMove([FromQuery] int id, [FromQuery] string email)
         {
+            try
+            {
+                Game _game = _matchManager.GetGame(email)!;
+
+                if (id >= _game.Players.Count)
+                    return Ok();
+
+                AIPlayer player = (AIPlayer)_game.Players[id];
+
+                player.CalculateNextMove(_game);
+
+                OpponentDTO opponent = OpponentDTO.GenerateStructFromClass(player);
+                Console.WriteLine(opponent.Move);
+                return Ok(JsonConvert.SerializeObject(opponent));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"{ex.StackTrace}");
+                return BadRequest();
+            }
+        }
+
+        [HttpGet]
+        [Route("/game/advance")]
+        public ActionResult AdvanceGame([FromQuery] string email)
+        {
+            Game _game = _matchManager.GetGame(email)!;
             GameStage stage = _game.CurrentStage;
             _game.AdvanceGame();
 
             if (stage == _game.CurrentStage)
-                return BadRequest();
+                return Ok();
 
-            return Ok(JsonConvert.SerializeObject(GenerateDTO()));
+            return Ok(JsonConvert.SerializeObject(GenerateGameDTO(_game)));
         }
 
         [HttpGet]
-        [Route("/game/situp")]
-        public async Task<IActionResult> SitUpFromTable([FromQuery] string token)
+        [Route("/game/situp")]  
+        public async Task<IActionResult> SitUpFromTable(
+            [FromQuery] string token,
+            [FromQuery] string email
+        )
         {
             if (!await _httpHelper.IsUserAuthenticatedAsync(token))
                 return Unauthorized();
 
-            if (_gameManager.AddGameToList(GenerateDTO()))
+            Game _game = _matchManager.GetGame(email)!;
+
+            if (_gameManager.AddGameToList(_game))
             {
                 return Ok();
             }
@@ -155,36 +252,68 @@ namespace GameAPI.Controllers
         }
 
         [HttpGet]
-        [Route("/game/")]
+        [Route("/game/addtoScores")]
         public async Task<IActionResult> AddPlayerToScoreBoard(
             [FromQuery] string token,
-            [FromQuery] int chipsWon,
-            [FromQuery] int playerKnocked,
-            [FromQuery] int tableKnocked
+            [FromQuery] string email
         )
         {
             if (!await _httpHelper.IsUserAuthenticatedAsync(token))
                 return Unauthorized();
 
+            Game _game = _matchManager.GetGame(email)!;
+
             Player player = _game.Players[0];
-            ScoreboardManager.AddToList(
-                new Scoreboard(player.Email, chipsWon, playerKnocked, tableKnocked)
+            _scoreboardManager.AddToList(
+                new Scoreboard(player.Email, player.Chips, player.PlayersKnockedOut, player.TablesWon)
             );
             return Ok(JsonConvert.SerializeObject(ScoreboardManager.ScoreboardList));
         }
 
-        private GameDTO GenerateDTO()
+        [HttpGet]
+        [Route("/game/getScores")]
+        public async Task<IActionResult> GetScoreboard([FromQuery] string token)
         {
-            GameDTO dto =
-                new()
-                {
-                    Pot = _game.Pot,
-                    Deck = _game.Deck,
-                    Players = _game.Players,
-                    CurrentStage = _game.CurrentStage,
-                    Blinds = _game.Blinds!,
-                    TableCards = _game.TableCards
-                };
+            if (!await _httpHelper.IsUserAuthenticatedAsync(token))
+                return Unauthorized();
+
+            var orderedDict = ScoreboardManager.ScoreboardList.OrderByDescending(s => s.ChipsWon).ToList();
+            Console.WriteLine(JsonConvert.SerializeObject(orderedDict));
+            return Ok(JsonConvert.SerializeObject(orderedDict));
+        }
+
+        [HttpGet]
+        [Route("/game/getRoundWinner")]
+        public ActionResult GetRoundWinner([FromQuery] string token,
+            [FromQuery] string email)
+        {
+            Game _game = _matchManager.GetGame(email);
+            if (_game is null)
+                return NotFound();
+
+            if (_game.LastRoundWinner is null)
+                return NotFound();
+
+            return Ok(JsonConvert.SerializeObject(_game.LastRoundWinner));
+        }
+
+        private GameDTO GenerateGameDTO(Game game)
+        {
+            List<OpponentDTO> opponents = new();
+            for(int i = 1; i < game.Players?.Count; i++)
+            {
+                opponents.Add(OpponentDTO.GenerateStructFromClass(game.Players[i]));   
+            }
+            GameDTO dto = new GameDTO
+            {
+                Blinds = game.Blinds,
+                Player = game.Players[0],
+                Opponents = opponents,
+                CurrentStage = game.CurrentStage,
+                TableCards = game.TableCards,
+                LastRoundWinner = game.LastRoundWinner,
+                Pot = game.Pot,
+            };
             return dto;
         }
     }

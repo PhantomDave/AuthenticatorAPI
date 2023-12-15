@@ -4,7 +4,7 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
-      "applicationUrl": "http://192.168.160.76:22720",
+      "applicationUrl": "http://0.0.0.0:22720",
       "sslPort": 44335
     }
   },
@@ -14,7 +14,7 @@
       "dotnetRunMessages": true,
       "launchBrowser": true,
       "launchUrl": "swagger",
-      "applicationUrl": "https://192.168.160.76:7217;http://192.168.160.76:5052",
+      "applicationUrl": "https://0.0.0.0:7217;http://0.0.0.0:5052",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }

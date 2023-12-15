@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Security;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Newtonsoft.Json;
 using PokerLibrary.Enums;
 using PokerLibrary.Interfaces;
 
@@ -12,27 +6,43 @@ namespace PokerLibrary.Models
 {
     public class Game : IGame
     {
-        public Deck Deck { get; private set; }
+        public Deck? Deck { get; private set; }
         public int Pot { get; private set; }
-        public List<Player> Players { get; private set; }
+        public List<Player>? Players { get; private set; }
         public GameStage CurrentStage { get; private set; }
         public int[]? Blinds { get; private set; }
-        public List<Card> TableCards { get; private set; }
+        public List<Card>? TableCards { get; private set; }
+        public dynamic? LastRoundWinner { get; private set; }
 
         public bool Started { get; set; }
 
+        [JsonConstructor]
+        public Game(Deck Deck, int Pot, List<Player> Players, GameStage CurrentStage, int[] Blinds, List<Card> TableCards, bool Started)
+        {     
+            this.Deck = Deck;
+            this.Pot = Pot;
+            this.Players = Players;
+            this.Blinds = Blinds;
+            this.CurrentStage = CurrentStage;
+            this.TableCards = TableCards;
+            this.Started = Started;
+        }
+
         public Game()
         {
-            Deck = new Deck();
-            Players = new List<Player>();
-            CurrentStage = GameStage.CompulsoryBets;
-            TableCards = new List<Card>();
-            Started = false;
+            InitializeGame();
+        }
+
+        private void InitializeGame()
+        {
+            this.Deck = new Deck();
+            this.Players = new List<Player>();
+            this.TableCards = new List<Card>();
         }
 
         public void SetBlinds(int smallblind, int bigblind)
         {
-            Blinds = new int[2] { smallblind, bigblind };
+            this.Blinds = new int[2] { smallblind, bigblind };
         }
 
         public bool CanCheck()
@@ -87,21 +97,25 @@ namespace PokerLibrary.Models
                 {
                     Player smallBlindPlayer = GetNextPlayerInTurn(dealer!);
                     Player bigBlindPlayer = GetNextPlayerInTurn(smallBlindPlayer);
-                    smallBlindPlayer.PrepareMove(NextMove.Bet, Blinds![0], true);
+                        smallBlindPlayer.PrepareMove(NextMove.Bet, Blinds![0], true);
                     bigBlindPlayer.PrepareMove(NextMove.Bet, Blinds[1], true);
-                    CurrentStage = GameStage.PreFlop;
+                        Pot += Blinds[0] + Blinds[1];
+                    this.CurrentStage = GameStage.PreFlop;
                     break;
                 }
                 case GameStage.PreFlop:
                 {
-                    Player i = GetNextPlayerInTurn(dealer!);
+                    Player? i = GetNextPlayerInTurn(dealer);
                     while (i != dealer)
                     {
+                        Console.WriteLine($"Dealing cards to: {i.Name}");
                         Deck.DealCards(i);
-                        i.PrepareMove(NextMove.Check);
                         i = GetNextPlayerInTurn(i);
+                        if (i == dealer)
+                            Deck.DealCards(i);
+                        //    i.PrepareMove(NextMove.Check);
                     }
-                    CurrentStage = GameStage.Flop;
+                    this.CurrentStage = GameStage.Flop;
                     break;
                 }
                 case GameStage.Flop:
@@ -117,7 +131,7 @@ namespace PokerLibrary.Models
                         }
 
                         ResetPlayerMoves();
-                        CurrentStage = GameStage.Turn;
+                        this.CurrentStage = GameStage.Turn;
                     }
                     break;
                 }
@@ -130,7 +144,7 @@ namespace PokerLibrary.Models
                         //Here i put the first 3 card on the table
                         TableCards.Add(Deck.GetCard());
                         ResetPlayerMoves();
-                        CurrentStage = GameStage.River;
+                        this.CurrentStage = GameStage.River;
                     }
                     break;
                 }
@@ -143,7 +157,7 @@ namespace PokerLibrary.Models
                         //Here i put the first 3 card on the table
                         TableCards.Add(Deck.GetCard());
                         ResetPlayerMoves();
-                        CurrentStage = GameStage.Showdown;
+                        this.CurrentStage = GameStage.Showdown;
                     }
                     break;
                 }
@@ -164,13 +178,25 @@ namespace PokerLibrary.Models
                 Player p =
                     GetRoundWinner()!
                     ?? throw new NullReferenceException("Player was null in Handle Showdown");
+                Console.WriteLine($"Round Winner is: {p.Name}, Chips Given {Pot}, HandValue: {p.HandValue}");
                 p.GivePlayerChips(Pot);
-                Pot = 0;
+
+                LastRoundWinner = new
+                {
+                    dName = p.Name,
+                    dPot = Pot,
+                    Comb = p.HandValue,
+                    dChipsWon = p.ChipsWon
+                };
+                this.Pot = 0;
                 TableCards.Clear();
-                Deck.GenerateNewDeck();
+                this.Deck = Deck.GenerateNewDeck();
                 ClearAllPlayerCards();
-                CheckRemainingPlayers();
-                CurrentStage = GameStage.CompulsoryBets;
+                int knocked = CheckRemainingPlayers();
+                p.AddPlayerKnockedOut(knocked);
+                this.CurrentStage = GameStage.CompulsoryBets;
+                AdvanceGame();
+                AdvanceGame();
             }
             catch (NullReferenceException)
             {
@@ -178,17 +204,21 @@ namespace PokerLibrary.Models
             }
         }
 
-        private void CheckRemainingPlayers()
+        private int CheckRemainingPlayers()
         {
             List<Player> newPlyList = new List<Player>(Players);
+            Console.WriteLine(Players.Count());
             foreach (Player p in Players)
             {
-                if (p.Chips == 0)
+                if (p.Chips <= 0 && p != Players.First())
                 {
                     newPlyList.Remove(p);
                 }
             }
-            Players = newPlyList;
+            int knockedout = Players.Count() - newPlyList.Count();
+            this.Players = newPlyList;
+            Console.WriteLine($"{Players.Count()}, NEW: {newPlyList.Count()}");
+            return knockedout;
         }
 
         private void ClearAllPlayerCards()
@@ -221,7 +251,7 @@ namespace PokerLibrary.Models
         {
             foreach (Player p in Players)
             {
-                if (p.Move == NextMove.Fold)
+                if (p.Move != NextMove.Fold && p.Move != NextMove.AllIn)
                     p.ResetMoveOfPlayer(p);
             }
         }
@@ -239,7 +269,7 @@ namespace PokerLibrary.Models
         public void StartGame()
         {
             Console.WriteLine("Starting Game..");
-            Started = true;
+            this.Started = true;
             AdvanceGame();
         }
 
@@ -249,6 +279,22 @@ namespace PokerLibrary.Models
             {
                 AddPlayerToGame(new AIPlayer(chips));
             }
+        }
+
+        public Game ResetGame()
+        {
+            Player player = Players.First();
+            Game game = new Game();
+            ClearAllPlayerCards();
+            game.AddPlayerToGame(player);
+            return game;
+        }
+
+        public void AddToPot(int chips)
+        {
+            if (chips < 0)
+                chips = -chips;
+            Pot += chips;
         }
     }
 }
