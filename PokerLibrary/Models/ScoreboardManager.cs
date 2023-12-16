@@ -7,7 +7,7 @@ public class ScoreboardManager : IListManager<List<Scoreboard>>
     public static List<Scoreboard> ScoreboardList = new();
     private static event FileManager<List<Scoreboard>>.SaveToFileDelegate? SaveNewList;
     private static readonly string FileName = "Scoresboard.json";
-    private static readonly FileManager<List<Scoreboard>> fileManager = new();
+    private static readonly FileManager<List<Scoreboard>> FileManager = new();
     private static object _istanceLock = new();
     private static ScoreboardManager? _instance = null;
 
@@ -36,12 +36,12 @@ public class ScoreboardManager : IListManager<List<Scoreboard>>
 
     public async void LoadList()
     {
-        ScoreboardList = await fileManager.LoadFromFile(FileName) ?? new();
+        ScoreboardList = await FileManager.LoadFromFile(FileName) ?? new();
     }
 
     public static void SaveToFile(string filename, List<Scoreboard> scoreboard)
     {
-        fileManager.SaveToFile(filename, scoreboard);
+        FileManager.SaveToFile(filename, scoreboard);
     }
 
     public void UpdateJsons()

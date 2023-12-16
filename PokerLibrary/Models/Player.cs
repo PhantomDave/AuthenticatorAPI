@@ -23,16 +23,16 @@ namespace PokerLibrary.Models
         public int TablesWon { get; private set; }
 
         [JsonConstructor]
-        public Player(string Name, string Email, List<Card> Hand, int Chips, int Bet, NextMove Move, PlayerRole CurrentRole, int HandValue)
+        public Player(string name, string email, List<Card> hand, int chips, int bet, NextMove move, PlayerRole currentRole, int handValue)
         {
-            this.Name = Name;
-            this.Email = Email;
-            this.Hand = Hand;
-            this.Chips = Chips;
-            this.Bet = Bet;
-            this.Move = Move;
-            this.CurrentRole = CurrentRole;
-            this.HandValue = HandValue;
+            this.Name = name;
+            this.Email = email;
+            this.Hand = hand;
+            this.Chips = chips;
+            this.Bet = bet;
+            this.Move = move;
+            this.CurrentRole = currentRole;
+            this.HandValue = handValue;
         }
 
         public Player() { }
@@ -59,49 +59,56 @@ namespace PokerLibrary.Models
         {
             p.Move = NextMove.None;
         }
-
-        //TODO: Improve calculation of Hand value by taking in consideration the card Value like i do in the "Poker Hand" section
+        
         public void CalculateHandValue(List<Card> tableCards)
         {
             try
             {
-
                 List<Card> totalCards = new List<Card>();
                 totalCards.AddRange(tableCards);
                 totalCards.AddRange(Hand);
-                Suits[] suits = totalCards.Select(c => c.suit).Distinct().ToArray();
-                CardValue[] seq = totalCards.Select(c => c.value).OrderBy(s => s).ToArray();
-                CardValue[] Poker = seq.GroupBy(c => c)
+                if (totalCards.Count == 0)
+                {
+                    HandValue = 0;
+                    return;
+                }
+                Suits[] suits = totalCards.Select(c => c.Suit).Distinct().ToArray();
+                CardValue[] seq = totalCards.Select(c => c.Value).OrderBy(s => s).ToArray();
+                CardValue[] poker = seq.GroupBy(c => c)
                     .Where(n => n.Count() == 4)
                     .Select(p => p.First())
                     .ToArray();
-                CardValue[] Tris = seq.GroupBy(c => c)
+                CardValue[] tris = seq.GroupBy(c => c)
                     .Where(n => n.Count() == 3)
                     .Select(p => p.First())
                     .ToArray();
-                CardValue[] Pair = seq.GroupBy(c => c)
+                CardValue[] pair = seq.GroupBy(c => c)
                     .Where(n => n.Count() == 2)
                     .Select(p => p.First())
                     .ToArray();
-
-                if (seq.Zip(seq.Skip(1), (a, b) => (a + 1) == b).All(x => x))
+                
+                if (seq.Length > 0)
                 {
-                    if (seq[0] == CardValue.Ten && seq[4] == CardValue.Ace)
+                    if (seq.Zip(seq.Skip(1), (a, b) => (a + 1) == b).All(x => x))
                     {
-                        HandValue = 500;
+                        if (seq[0] == CardValue.Ten && seq[4] == CardValue.Ace)
+                        {
+                            HandValue = 500;
+                            return;
+                        }
+                        HandValue = 100;
                         return;
                     }
-                    HandValue = 100;
-                    return;
                 }
-                if (Poker.Length > 0)
+
+                if (poker.Length > 0)
                 {
                     if (
-                        Poker.Contains(CardValue.Ten)
-                        || Poker.Contains(CardValue.Jack)
-                        || Poker.Contains(CardValue.Queen)
-                        || Poker.Contains(CardValue.King)
-                        || Poker.Contains(CardValue.Ace)
+                        poker.Contains(CardValue.Ten)
+                        || poker.Contains(CardValue.Jack)
+                        || poker.Contains(CardValue.Queen)
+                        || poker.Contains(CardValue.King)
+                        || poker.Contains(CardValue.Ace)
                     )
                     {
                         HandValue = 80;
@@ -110,7 +117,7 @@ namespace PokerLibrary.Models
                     HandValue = 70;
                     return;
                 }
-                if (Tris.Length > 0 && Pair.Length > 0)
+                if (tris.Length > 0 && pair.Length > 0)
                 {
                     //KIASTOFUL
                     HandValue = 65;
@@ -121,26 +128,28 @@ namespace PokerLibrary.Models
                     HandValue = 60;
                     return;
                 }
-                if (Tris.Length > 0)
+                if (tris.Length > 0)
                 {
                     HandValue = 50;
                     return;
                 }
-                if (Pair.Length > 1)
+                if (pair.Length > 1)
                 {
                     HandValue = 30;
                     return;
                 }
-                if (Pair.Length > 0 && Pair.Length < 1)
+                if (pair.Length > 0 && pair.Length < 1)
                 {
                     HandValue = 15;
                     return;
                 }
-                HandValue = (int)totalCards.MaxBy(c => (int)c.value)!.value;
+                HandValue = (int)totalCards.MaxBy(c => (int)c.Value)!.Value;
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
+                Console.WriteLine(ex);
                 Console.WriteLine(ex.StackTrace);
+                Console.WriteLine(ex.Message);
                 HandValue = -100;
             }
         }

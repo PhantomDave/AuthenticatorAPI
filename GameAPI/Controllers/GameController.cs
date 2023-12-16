@@ -48,9 +48,9 @@ namespace GameAPI.Controllers
                 return NotFound(JsonConvert.SerializeObject("Invalid Credentials"));
             }
 
-            Game? _game = _matchManager.GetGame(user.Email!) ?? new Game();
-            _game.AddPlayerToGame(new Player(user.Email!, 0));
-            _matchManager.AddGameToManager(_game, user.Email!);
+            Game? game = _matchManager.GetGame(user.Email!) ?? new Game();
+            game.AddPlayerToGame(new Player(user.Email!, 0));
+            _matchManager.AddGameToManager(game, user.Email!);
             return Ok(userTok);
         }
 
@@ -67,10 +67,10 @@ namespace GameAPI.Controllers
                 if (!await _httpHelper.IsUserAuthenticatedAsync(token))
                     return Unauthorized();
 
-                Game? _game = _matchManager.GetGame(email);
-                if (_game.Players.Count == 0)
-                    _game.AddPlayerToGame(new Player(email, 0));
-                Player player = _game!.Players[0];
+                Game? game = _matchManager.GetGame(email);
+                if (game.Players.Count == 0)
+                    game.AddPlayerToGame(new Player(email, 0));
+                Player player = game!.Players[0];
                 player.SetUsername(username);
                 return Ok();
             }
@@ -91,15 +91,15 @@ namespace GameAPI.Controllers
             int chips
         )
         {
-            Game _game = _matchManager.GetGame(email)!;
+            Game game = _matchManager.GetGame(email)!;
 
-            _game ??= new Game();
+            game ??= new Game();
 
-            if (_game.Started)
+            if (game.Started)
             {
                 _matchManager.RemoveGame(email);
-                _game = _game.ResetGame();
-                _matchManager.AddGameToManager(_game, email);
+                game = game.ResetGame();
+                _matchManager.AddGameToManager(game, email);
             }
 
             if (numplayer > 5)
@@ -110,12 +110,12 @@ namespace GameAPI.Controllers
             if (!await _httpHelper.IsUserAuthenticatedAsync(token))
                 return Unauthorized();
 
-            _game.SetBlinds(smallblind, bigblind);
-            _game.Players.First().SetChips(chips);
-            _game.SetupAIPlayers(numplayer, chips);
-            _game.StartGame();
-            _game.AdvanceGame();
-            return Ok(JsonConvert.SerializeObject(GenerateGameDTO(_game)));
+            game.SetBlinds(smallblind, bigblind);
+            game.Players.First().SetChips(chips);
+            game.SetupAiPlayers(numplayer, chips);
+            game.StartGame();
+            game.AdvanceGame();
+            return Ok(JsonConvert.SerializeObject(GenerateGameDto(game)));
         }
 
         [HttpGet]
@@ -125,18 +125,18 @@ namespace GameAPI.Controllers
             if (!await _httpHelper.IsUserAuthenticatedAsync(token))
                 return Unauthorized();
 
-            Game? _game = _gameManager.FindGame(email);
-            if (_game is null) return Ok();
-            if (!_game.Started)
+            Game? game = _gameManager.FindGame(email);
+            if (game is null) return Ok();
+            if (!game.Started)
                 return Ok();
             if (_matchManager.GetGame(email) != null)
             {
                 _matchManager.RemoveGame(email);
             }
 
-            _matchManager.AddGameToManager(_game, email);
+            _matchManager.AddGameToManager(game, email);
 
-            return Ok(JsonConvert.SerializeObject(GenerateGameDTO(_game)));
+            return Ok(JsonConvert.SerializeObject(GenerateGameDto(game)));
         }
 
         [HttpGet]
@@ -146,8 +146,8 @@ namespace GameAPI.Controllers
             if (!await _httpHelper.IsUserAuthenticatedAsync(token))
                 return Unauthorized();
 
-            Game? _game = _gameManager.FindGame(email);
-            if (_game is null) return Ok();
+            Game? game = _gameManager.FindGame(email);
+            if (game is null) return Ok();
 
             if (_matchManager.GetGame(email) != null)
             {
@@ -170,19 +170,17 @@ namespace GameAPI.Controllers
         {
             try
             {
-                Game _game = _matchManager.GetGame(email)!;
-                //this returns the next player in the turn
-                Player player = _game.Players[0];
+                Game game = _matchManager.GetGame(email)!;
+
+                Player player = game.Players[0];
 
 
                 player.PrepareMove((NextMove)move, bet);
 
                 if ((NextMove)move == NextMove.Bet)
                 {
-                    _game.AddToPot(bet);
+                    game.AddToPot(bet);
                 }
-
-                // Player nextPlayer = _game.GetNextPlayerInTurn(player);
 
                 return Ok(JsonConvert.SerializeObject(player));
             }
@@ -194,20 +192,20 @@ namespace GameAPI.Controllers
 
         [HttpGet]
         [Route("/game/getaimove")]
-        public ActionResult MakeAIMove([FromQuery] int id, [FromQuery] string email)
+        public ActionResult MakeAiMove([FromQuery] int id, [FromQuery] string email)
         {
             try
             {
-                Game _game = _matchManager.GetGame(email)!;
+                Game game = _matchManager.GetGame(email)!;
 
-                if (id >= _game.Players.Count)
+                if (id >= game.Players.Count)
                     return Ok();
 
-                AIPlayer player = (AIPlayer)_game.Players[id];
+                AiPlayer player = (AiPlayer)game.Players[id];
 
-                player.CalculateNextMove(_game);
+                player.CalculateNextMove(game);
 
-                OpponentDTO opponent = OpponentDTO.GenerateStructFromClass(player);
+                OpponentDto opponent = OpponentDto.GenerateStructFromClass(player);
                 Console.WriteLine(opponent.Move);
                 return Ok(JsonConvert.SerializeObject(opponent));
             }
@@ -222,14 +220,13 @@ namespace GameAPI.Controllers
         [Route("/game/advance")]
         public ActionResult AdvanceGame([FromQuery] string email)
         {
-            Game _game = _matchManager.GetGame(email)!;
-            GameStage stage = _game.CurrentStage;
-            _game.AdvanceGame();
-
-            if (stage == _game.CurrentStage)
+            Game game = _matchManager.GetGame(email)!;
+            GameStage stage = game.CurrentStage;
+            game.AdvanceGame();
+            if (stage == game.CurrentStage)
                 return Ok();
 
-            return Ok(JsonConvert.SerializeObject(GenerateGameDTO(_game)));
+            return Ok(JsonConvert.SerializeObject(GenerateGameDto(game)));
         }
 
         [HttpGet]
@@ -242,9 +239,9 @@ namespace GameAPI.Controllers
             if (!await _httpHelper.IsUserAuthenticatedAsync(token))
                 return Unauthorized();
 
-            Game _game = _matchManager.GetGame(email)!;
+            Game game = _matchManager.GetGame(email)!;
 
-            if (_gameManager.AddGameToList(_game))
+            if (_gameManager.AddGameToList(game))
             {
                 return Ok();
             }
@@ -261,9 +258,9 @@ namespace GameAPI.Controllers
             if (!await _httpHelper.IsUserAuthenticatedAsync(token))
                 return Unauthorized();
 
-            Game _game = _matchManager.GetGame(email)!;
+            Game game = _matchManager.GetGame(email)!;
 
-            Player player = _game.Players[0];
+            Player player = game.Players[0];
             _scoreboardManager.AddToList(
                 new Scoreboard(player.Email, player.Chips, player.PlayersKnockedOut, player.TablesWon)
             );
@@ -287,24 +284,24 @@ namespace GameAPI.Controllers
         public ActionResult GetRoundWinner([FromQuery] string token,
             [FromQuery] string email)
         {
-            Game _game = _matchManager.GetGame(email);
-            if (_game is null)
+            Game game = _matchManager.GetGame(email);
+            if (game is null)
                 return NotFound();
 
-            if (_game.LastRoundWinner is null)
+            if (game.LastRoundWinner is null)
                 return NotFound();
 
-            return Ok(JsonConvert.SerializeObject(_game.LastRoundWinner));
+            return Ok(JsonConvert.SerializeObject(game.LastRoundWinner));
         }
 
-        private GameDTO GenerateGameDTO(Game game)
+        private GameDto GenerateGameDto(Game game)
         {
-            List<OpponentDTO> opponents = new();
+            List<OpponentDto> opponents = new();
             for(int i = 1; i < game.Players?.Count; i++)
             {
-                opponents.Add(OpponentDTO.GenerateStructFromClass(game.Players[i]));   
+                opponents.Add(OpponentDto.GenerateStructFromClass(game.Players[i]));   
             }
-            GameDTO dto = new GameDTO
+            GameDto dto = new GameDto
             {
                 Blinds = game.Blinds,
                 Player = game.Players[0],

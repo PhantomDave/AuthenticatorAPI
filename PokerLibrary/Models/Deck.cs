@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿ using Newtonsoft.Json;
 using PokerLibrary.Enums;
 using PokerLibrary.Exstensions;
 
@@ -7,7 +7,7 @@ namespace PokerLibrary.Models
     public class Deck
     {
         [JsonProperty]
-        private Queue<Card> _cards;
+        private List<Card> _cards;
 
         public Deck()
         {
@@ -15,31 +15,34 @@ namespace PokerLibrary.Models
             ShuffleDeck();
         }
 
-        private Queue<Card>? GenerateFullDeck()
+        private List<Card>? GenerateFullDeck()
         {
-            Queue<Card> cards = new Queue<Card>();
+            List<Card> cards = new List<Card>();
             foreach (CardValue card in Enum.GetValues(typeof(CardValue)))
             {
                 Card card1 = new Card(card, Suits.Diamond);
                 Card card2 = new Card(card, Suits.Hearts);
                 Card card3 = new Card(card, Suits.Spade);
                 Card card4 = new Card(card, Suits.Club);
-                cards.Enqueue(card1);
-                cards.Enqueue(card2);
-                cards.Enqueue(card3);
-                cards.Enqueue(card4);
+                cards.Add(card1);
+                cards.Add(card2);
+                cards.Add(card3);
+                cards.Add(card4);
             }
             return cards;
         }
 
         private void ShuffleDeck()
         {
-            List<Card> _cardList = _cards.ToList();
-            _cardList.Shuffle();
-            _cards = new Queue<Card>(_cardList);
+            _cards.Shuffle();
         }
 
-        public Card GetCard() => _cards.Dequeue();
+        public Card GetCard()
+        {
+            Card card = _cards.First();
+            _cards.Remove(card);
+            return card;
+        }
 
         public Deck GenerateNewDeck()
         {

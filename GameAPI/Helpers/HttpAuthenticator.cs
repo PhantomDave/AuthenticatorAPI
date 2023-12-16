@@ -8,19 +8,19 @@ namespace GameAPI.Helpers
     public class HttpHelper
     {
         private string Url { get; set; }
-        private HttpClient httpClient { get; set; }
+        private HttpClient HttpClient { get; set; }
 
         public HttpHelper(string url)
         {
             Url = url;
-            httpClient = new HttpClient();
+            HttpClient = new HttpClient();
         }
 
         public async Task<string> ValidateUserEmailAsync(string email)
         {
             try
             {
-                HttpResponseMessage response = await httpClient.GetAsync(Url + "/login/" + email);
+                HttpResponseMessage response = await HttpClient.GetAsync(Url + "/login/" + email);
                 Console.WriteLine(Url + "/login/" + email);
                 response.EnsureSuccessStatusCode();
                 return await response.Content.ReadAsStringAsync();
@@ -40,7 +40,7 @@ namespace GameAPI.Helpers
 
             StringContent content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            HttpResponseMessage response = await httpClient.PostAsync(Url + "/login/", content);
+            HttpResponseMessage response = await HttpClient.PostAsync(Url + "/login/", content);
             if (response.IsSuccessStatusCode)
             {
                 string responseContent = await response.Content.ReadAsStringAsync();
@@ -51,7 +51,7 @@ namespace GameAPI.Helpers
 
         public async Task<bool> IsUserAuthenticatedAsync(string token)
         {
-            HttpResponseMessage response = await httpClient.GetAsync(
+            HttpResponseMessage response = await HttpClient.GetAsync(
                 Url + "/checkauth/?token=" + token
             );
             if (response.IsSuccessStatusCode)

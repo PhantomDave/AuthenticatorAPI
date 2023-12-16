@@ -19,5 +19,5 @@ public interface IGame
     Player GetNextPlayerInTurn(Player currentPlayer);
     GameStage AdvanceGame();
     void StartGame();
-    void SetupAIPlayers(int numplayer, int chips);
+    void SetupAiPlayers(int numplayer, int chips);
 }

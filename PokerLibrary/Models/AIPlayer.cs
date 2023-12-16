@@ -3,10 +3,10 @@ using Newtonsoft.Json;
 
 namespace PokerLibrary.Models
 {
-    public class AIPlayer : Player
+    public class AiPlayer : Player
     {
         [JsonProperty]
-        public AIPersonality AIPersonality { get; private set; }
+        public AiPersonality AiPersonality { get; private set; }
         public static string[] Usernames = new string[]
         {
             "Davide0",
@@ -26,18 +26,18 @@ namespace PokerLibrary.Models
         };
         
         [JsonConstructor]
-        public AIPlayer(string Name, string Email, List<Card> Hand, int Chips, int Bet, NextMove Move, PlayerRole CurrentRole, int HandValue, AIPersonality AIPersonality)
-            : base(Name, Email, Hand, Chips, Bet, Move, CurrentRole, HandValue)
+        public AiPlayer(string name, string email, List<Card> hand, int chips, int bet, NextMove move, PlayerRole currentRole, int handValue, AiPersonality aiPersonality)
+            : base(name, email, hand, chips, bet, move, currentRole, handValue)
         {
-            this.AIPersonality = AIPersonality;
+            this.AiPersonality = aiPersonality;
         }
 
-        public AIPlayer(int chips)
+        public AiPlayer(int chips)
             : base("", chips)
         {
             Random rnd = new Random();
-            int rndValue = rnd.Next(0, Enum.GetValues(typeof(AIPersonality)).Length);
-            AIPersonality = (AIPersonality)rndValue;
+            int rndValue = rnd.Next(0, Enum.GetValues(typeof(AiPersonality)).Length);
+            AiPersonality = (AiPersonality)rndValue;
             rndValue = rnd.Next(0, Usernames.Length);
             SetUsername(Usernames[rndValue]);
         }
@@ -46,8 +46,11 @@ namespace PokerLibrary.Models
         {
             try
             {
-                if (Move == NextMove.Fold  || Move == NextMove.AllIn)
+                if (Move == NextMove.Fold || Move == NextMove.AllIn)
+                {
+                    PrepareMove(Move);
                     return;
+                }
 
                 List<Card> cards = new();
                 cards.AddRange(Hand);
@@ -55,17 +58,17 @@ namespace PokerLibrary.Models
                 CalculateHandValue(cards);
                 int personalityAndRandomValue = CalculatePersonalityAndRandom();
                 int moveRiskValue = CalculateRiskOfMove(currentGame);
-                int RiskValue = personalityAndRandomValue + moveRiskValue - HandValue;
+                int riskValue = personalityAndRandomValue + moveRiskValue - HandValue;
                 //TODO: REMOVE DEBUG:
 
                 Console.WriteLine(
-                    $"Personality and Random: {personalityAndRandomValue} MOVE RISK; {moveRiskValue}, RISKVALUE: {RiskValue}"
+                    $"Personality and Random: {Name} {AiPersonality} {personalityAndRandomValue} MOVE RISK; {moveRiskValue}, RISKVALUE: {riskValue}"
                 );
 
                 Random random = new Random();
                 int rnd = 0;
-                if (RiskValue > 0)
-                    rnd = random.Next(0, RiskValue);
+                if (riskValue > 0)
+                    rnd = random.Next(0, riskValue);
 
                 if (HandValue > 500)
                 {
@@ -73,7 +76,7 @@ namespace PokerLibrary.Models
                     return;
                 }
 
-                if (RiskValue >= 100)
+                if (riskValue >= 100)
                 {
                     if (currentGame.CanCheck())
                     {
@@ -83,18 +86,26 @@ namespace PokerLibrary.Models
                     PrepareMove(NextMove.Fold);
                     return;
                 }
-                if (RiskValue >= 35 && RiskValue <= 75 && currentGame.CanCheck())
+                if (riskValue >= 50 && riskValue < 99 && currentGame.CanCheck())
                 {
-                    PrepareMove(NextMove.Check, RiskValue);
+                    PrepareMove(NextMove.Check, riskValue);
                     return;
                 }
 
-                if (RiskValue <= 35)
+                if (riskValue < 49 &&  riskValue > 0)
                 {
-                    PrepareMove(NextMove.Bet, RiskValue + rnd);
-                    currentGame.AddToPot(RiskValue + rnd);
+                    PrepareMove(NextMove.Bet, riskValue + rnd);
+                    currentGame.AddToPot(riskValue + rnd);
                     return;
                 }
+
+                if (riskValue < 0)
+                {
+                    PrepareMove(NextMove.AllIn, Chips);
+                    currentGame.AddToPot(Chips);
+                    return;
+                }
+                PrepareMove(NextMove.Fold);
             }
             catch (Exception ex)
             {
@@ -108,27 +119,30 @@ namespace PokerLibrary.Models
             int val = 0;
             foreach (Player player in currentGame.Players)
             {
-                if (
-                    player.Move == NextMove.Bet && player.Bet > Chips
-                    || player.Move == NextMove.AllIn && player.Bet > Chips
-                )
+                switch (player.Move)
                 {
-                    val += 100;
-                }
+                    case NextMove.Bet:
+                        case NextMove.AllIn:
+                        {
+                            if (player.Bet > Chips)
+                                val += 70;
+                            else val += 30;
+                            break;
+                        }
 
-                if (player.Move == NextMove.AllIn)
-                {
-                    val += 50;
-                }
-
-                if (player.Move == NextMove.Check)
-                {
-                    val += 10;
+                    case NextMove.Check:
+                        val += 10;
+                        break;
+                    case NextMove.Fold:
+                    case NextMove.None:
+                    default:
+                        val += 0;
+                        break;
                 }
             }
             if (currentGame.Pot > Chips)
             {
-                val += 100;
+                val -= 20;
             }
             return val;
         }
@@ -136,29 +150,29 @@ namespace PokerLibrary.Models
         private int CalculatePersonalityAndRandom()
         {
             int val = 0;
-            switch (AIPersonality)
+            switch (AiPersonality)
             {
-                case AIPersonality.Bluffer:
+                case AiPersonality.Bluffer:
                 {
-                    val += 15;
+                    val -= 20;
                     break;
                 }
-                case AIPersonality.Aggressive:
+                case AiPersonality.Aggressive:
                 {
-                    val += 20;
+                    val -= 30;
                     break;
                 }
-                case AIPersonality.Cautious:
+                case AiPersonality.Cautious:
                 {
-                    val += -10;
+                    val += 30;
                     break;
                 }
-                case AIPersonality.Folder:
+                case AiPersonality.Folder:
                 {
-                    val -= 50;
+                    val += 35;
                     break;
                 }
-                case AIPersonality.Random:
+                case AiPersonality.Random:
                 {
                     Random random = new Random();
                     val += random.Next(100);

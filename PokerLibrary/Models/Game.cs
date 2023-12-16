@@ -6,26 +6,26 @@ namespace PokerLibrary.Models
 {
     public class Game : IGame
     {
-        public Deck? Deck { get; private set; }
+        public Deck Deck { get; private set; }
         public int Pot { get; private set; }
-        public List<Player>? Players { get; private set; }
+        public List<Player> Players { get; private set; }
         public GameStage CurrentStage { get; private set; }
         public int[]? Blinds { get; private set; }
-        public List<Card>? TableCards { get; private set; }
+        public List<Card> TableCards { get; private set; }
         public dynamic? LastRoundWinner { get; private set; }
 
-        public bool Started { get; set; }
+        public bool Started { get; private set; }
 
         [JsonConstructor]
-        public Game(Deck Deck, int Pot, List<Player> Players, GameStage CurrentStage, int[] Blinds, List<Card> TableCards, bool Started)
+        public Game(Deck deck, int pot, List<Player> players, GameStage currentStage, int[] blinds, List<Card> tableCards, bool started)
         {     
-            this.Deck = Deck;
-            this.Pot = Pot;
-            this.Players = Players;
-            this.Blinds = Blinds;
-            this.CurrentStage = CurrentStage;
-            this.TableCards = TableCards;
-            this.Started = Started;
+            this.Deck = deck;
+            this.Pot = pot;
+            this.Players = players;
+            this.Blinds = blinds;
+            this.CurrentStage = currentStage;
+            this.TableCards = tableCards;
+            this.Started = started;
         }
 
         public Game()
@@ -66,19 +66,12 @@ namespace PokerLibrary.Models
         public Player GetNextPlayerInTurn(Player currentPlayer)
         {
             int indexof = Players.IndexOf(currentPlayer) + 1;
-            if (indexof >= Players.Count())
-                return Players.First();
-            return Players[indexof];
+            return indexof >= Players.Count() ? Players.First() : Players[indexof];
         }
 
         private Player? FindDealer()
         {
-            foreach (Player p in Players)
-            {
-                if (p.CurrentRole == PlayerRole.Dealer)
-                    return p;
-            }
-            return null;
+            return Players.FirstOrDefault(p => p.CurrentRole == PlayerRole.Dealer);
         }
 
         public GameStage AdvanceGame()
@@ -113,7 +106,6 @@ namespace PokerLibrary.Models
                         i = GetNextPlayerInTurn(i);
                         if (i == dealer)
                             Deck.DealCards(i);
-                        //    i.PrepareMove(NextMove.Check);
                     }
                     this.CurrentStage = GameStage.Flop;
                     break;
@@ -195,11 +187,10 @@ namespace PokerLibrary.Models
                 int knocked = CheckRemainingPlayers();
                 p.AddPlayerKnockedOut(knocked);
                 this.CurrentStage = GameStage.CompulsoryBets;
-                AdvanceGame();
-                AdvanceGame();
             }
             catch (NullReferenceException)
             {
+                Console.WriteLine("NulL Reference when handling showdown game");
                 return;
             }
         }
@@ -217,7 +208,6 @@ namespace PokerLibrary.Models
             }
             int knockedout = Players.Count() - newPlyList.Count();
             this.Players = newPlyList;
-            Console.WriteLine($"{Players.Count()}, NEW: {newPlyList.Count()}");
             return knockedout;
         }
 
@@ -235,11 +225,11 @@ namespace PokerLibrary.Models
             foreach (Player ply in Players)
             {
                 ply.CalculateHandValue(TableCards);
-                int HandValue = ply.HandValue;
+                int handValue = ply.HandValue;
 
                 p ??= ply;
 
-                if (HandValue > p.HandValue)
+                if (handValue > p.HandValue)
                 {
                     p = ply;
                 }
@@ -273,11 +263,11 @@ namespace PokerLibrary.Models
             AdvanceGame();
         }
 
-        public void SetupAIPlayers(int numplayer, int chips)
+        public void SetupAiPlayers(int numplayer, int chips)
         {
             for (int i = 0; i < numplayer; i++)
             {
-                AddPlayerToGame(new AIPlayer(chips));
+                AddPlayerToGame(new AiPlayer(chips));
             }
         }
 

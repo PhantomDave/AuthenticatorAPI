@@ -8,7 +8,7 @@ namespace PokerLibraryUnitTest
         [TestMethod]
         public void CheckStraightFlush()
         {
-            Game _game = new Game();
+            Game game = new Game();
             Player player = new Player("test@test.it", 1000);
             Card card = new Card(PokerLibrary.Enums.CardValue.Two, PokerLibrary.Enums.Suits.Diamond);
             Card card1 = new Card(PokerLibrary.Enums.CardValue.Three, PokerLibrary.Enums.Suits.Diamond);
@@ -18,11 +18,11 @@ namespace PokerLibraryUnitTest
 
             player.Hand.Add(card);
             player.Hand.Add(card1);
-            _game.TableCards.Add(card2);
-            _game.TableCards.Add(card3);
-            _game.TableCards.Add(card4);
+            game.TableCards.Add(card2);
+            game.TableCards.Add(card3);
+            game.TableCards.Add(card4);
 
-            player.CalculateHandValue(_game.TableCards);
+            player.CalculateHandValue(game.TableCards);
 
             Assert.AreEqual(player.HandValue, 100);
         }
@@ -30,7 +30,7 @@ namespace PokerLibraryUnitTest
         [TestMethod]
         public void CheckRoyalFlush()
         {
-            Game _game = new Game();
+            Game game = new Game();
             Player player = new Player("test@test.it", 1000);
             Card card = new Card(PokerLibrary.Enums.CardValue.Ten, PokerLibrary.Enums.Suits.Diamond);
             Card card1 = new Card(PokerLibrary.Enums.CardValue.Jack, PokerLibrary.Enums.Suits.Diamond);
@@ -40,11 +40,11 @@ namespace PokerLibraryUnitTest
 
             player.Hand.Add(card);
             player.Hand.Add(card1);
-            _game.TableCards.Add(card2);
-            _game.TableCards.Add(card3);
-            _game.TableCards.Add(card4);
+            game.TableCards.Add(card2);
+            game.TableCards.Add(card3);
+            game.TableCards.Add(card4);
 
-            player.CalculateHandValue(_game.TableCards);
+            player.CalculateHandValue(game.TableCards);
 
             Assert.AreEqual(player.HandValue, 500);
         }
@@ -53,7 +53,7 @@ namespace PokerLibraryUnitTest
         [TestMethod]
         public void CheckPoker()
         {
-            Game _game = new Game();
+            Game game = new Game();
             Player player = new Player("test@test.it", 1000);
             Card card = new Card(PokerLibrary.Enums.CardValue.Ten, PokerLibrary.Enums.Suits.Diamond);
             Card card1 = new Card(PokerLibrary.Enums.CardValue.Ten, PokerLibrary.Enums.Suits.Hearts);
@@ -63,11 +63,11 @@ namespace PokerLibraryUnitTest
 
             player.Hand.Add(card);
             player.Hand.Add(card1);
-            _game.TableCards.Add(card2);
-            _game.TableCards.Add(card3);
-            _game.TableCards.Add(card4);
+            game.TableCards.Add(card2);
+            game.TableCards.Add(card3);
+            game.TableCards.Add(card4);
 
-            player.CalculateHandValue(_game.TableCards);
+            player.CalculateHandValue(game.TableCards);
 
             Assert.AreEqual(player.HandValue, 80);
         }
@@ -75,7 +75,7 @@ namespace PokerLibraryUnitTest
         [TestMethod]
         public void CheckColorFlush()
         {
-            Game _game = new Game();
+            Game game = new Game();
             Player player = new Player("test@test.it", 1000);
             Card card = new Card(PokerLibrary.Enums.CardValue.Five, PokerLibrary.Enums.Suits.Diamond);
             Card card1 = new Card(PokerLibrary.Enums.CardValue.Six, PokerLibrary.Enums.Suits.Diamond);
@@ -85,11 +85,11 @@ namespace PokerLibraryUnitTest
 
             player.Hand.Add(card);
             player.Hand.Add(card1);
-            _game.TableCards.Add(card2);
-            _game.TableCards.Add(card3);
-            _game.TableCards.Add(card4);
+            game.TableCards.Add(card2);
+            game.TableCards.Add(card3);
+            game.TableCards.Add(card4);
 
-            player.CalculateHandValue(_game.TableCards);
+            player.CalculateHandValue(game.TableCards);
 
             Assert.AreEqual(player.HandValue, 60);
         }

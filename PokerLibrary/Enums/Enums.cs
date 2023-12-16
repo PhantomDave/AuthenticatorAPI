@@ -41,7 +41,7 @@ namespace PokerLibrary.Enums
         Showdown = 5
     }
 
-    public enum AIPersonality
+    public enum AiPersonality
     {
         Bluffer = 0,
         Aggressive = 1,

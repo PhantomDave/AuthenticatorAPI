@@ -9,15 +9,15 @@ namespace PokerLibrary.Models
 {
     public class Card
     {
-        public CardValue value { get; private set; }
-        public Suits suit { get; private set; }
+        public CardValue Value { get; private set; }
+        public Suits Suit { get; private set; }
 
         public Card(CardValue value, Suits suit)
         {
-            this.value = value;
-            this.suit = suit;
+            this.Value = value;
+            this.Suit = suit;
         }
 
-        public override string ToString() => $"{value} of {suit}"; 
+        public override string ToString() => $"{Value} of {Suit}"; 
     }
 }

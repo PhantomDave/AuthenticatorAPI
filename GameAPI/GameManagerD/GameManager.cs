@@ -8,8 +8,8 @@ public class GameManager : IListManager<Dictionary<string, Game>>
 {
     public static Dictionary<string, Game> Games = new();
     private static event FileManager<Dictionary<string, Game>>.SaveToFileDelegate? SaveNewList;
-    private static string FileName = "Games.json";
-    private static readonly FileManager<Dictionary<string, Game>> fileManager = new();
+    private static string _fileName = "Games.json";
+    private static readonly FileManager<Dictionary<string, Game>> FileManager = new();
 
     private static object _istanceLock = new();
     private static GameManager? _instance = null;
@@ -39,17 +39,17 @@ public class GameManager : IListManager<Dictionary<string, Game>>
 
     public async void LoadList()
     {
-        Games = await fileManager.LoadFromFile(FileName) ?? new();
+        Games = await FileManager.LoadFromFile(_fileName) ?? new();
     }
 
     public void SaveToFile(string filename, Dictionary<string, Game> game)
     {
-        fileManager.SaveToFile(filename, game);
+        FileManager.SaveToFile(filename, game);
     }
 
     public void UpdateJsons()
     {
-        SaveNewList?.Invoke(FileName, Games);
+        SaveNewList?.Invoke(_fileName, Games);
     }
 
     public Game? FindGame(string email)
@@ -58,9 +58,9 @@ public class GameManager : IListManager<Dictionary<string, Game>>
         return game;
     }
 
-    public bool AddGameToList(Game gameDTO)
+    public bool AddGameToList(Game gameDto)
     {
-        if (Games.TryAdd(gameDTO.Players[0].Email, gameDTO))
+        if (Games.TryAdd(gameDto.Players[0].Email, gameDto))
         {
             UpdateJsons();
             return true;

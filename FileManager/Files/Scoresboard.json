@@ -39,8 +39,8 @@
     {
       "$type": "PokerLibrary.Models.Scoreboard, PokerLibrary",
       "Email": "dave@dave.it",
-      "ChipsWon": 4022,
-      "PlayersKnockedOut": 36,
+      "ChipsWon": 11716,
+      "PlayersKnockedOut": 44,
       "TablesWon": 0
     }
   ]

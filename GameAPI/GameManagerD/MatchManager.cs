@@ -5,7 +5,7 @@ namespace GameManagerD;
 
 public class MatchManager
 {
-    public Dictionary<string, Game> _games = new Dictionary<string, Game>();
+    public Dictionary<string, Game> Games = new Dictionary<string, Game>();
     private static object _istanceLock = new();
     private static MatchManager? _instance = null;
 
@@ -26,7 +26,7 @@ public class MatchManager
 
     public bool AddGameToManager(Game game, string email)
     {
-        if (_games.TryAdd(email, game))
+        if (Games.TryAdd(email, game))
         {
             return true;
         }
@@ -35,12 +35,12 @@ public class MatchManager
 
     public Game? GetGame(string email)
     { 
-        _games.TryGetValue(email, out Game? game);
+        Games.TryGetValue(email, out Game? game);
         return game;
     }
 
     public void RemoveGame(string email)
     {
-        _games.Remove(email);
+        Games.Remove(email);
     }
 }

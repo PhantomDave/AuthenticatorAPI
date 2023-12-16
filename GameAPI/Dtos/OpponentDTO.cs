@@ -3,7 +3,7 @@ using PokerLibrary.Models;
 
 namespace GameAPI.Dtos
 {
-    public struct OpponentDTO
+    public struct OpponentDto
     {
         public string Name { get; init; }
         public int Chips { get; init; }
@@ -13,9 +13,9 @@ namespace GameAPI.Dtos
         public int HandValue { get; init; }
 
 
-        public static OpponentDTO GenerateStructFromClass(Player player)
+        public static OpponentDto GenerateStructFromClass(Player player)
         {
-            OpponentDTO playerDTO = new()
+            OpponentDto playerDto = new()
             {
                 Name = player.Name,
                 Chips = player.Chips,
@@ -25,7 +25,7 @@ namespace GameAPI.Dtos
                 HandValue = player.HandValue,
             };
 
-            return playerDTO;
+            return playerDto;
         }
     }
 }
