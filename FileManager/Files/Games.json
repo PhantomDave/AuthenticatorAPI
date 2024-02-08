@@ -1,0 +1,407 @@
+{
+  "$type": "System.Collections.Generic.Dictionary`2[[System.String, System.Private.CoreLib],[PokerLibrary.Models.Game, PokerLibrary]], System.Private.CoreLib",
+  "davidebrancato@gmail.com": {
+    "$type": "PokerLibrary.Models.Game, PokerLibrary",
+    "Deck": {
+      "$type": "PokerLibrary.Models.Deck, PokerLibrary",
+      "_cards": {
+        "$type": "System.Collections.Generic.Queue`1[[PokerLibrary.Models.Card, PokerLibrary]], System.Private.CoreLib",
+        "$values": [
+          {
+            "$type": "PokerLibrary.Models.Card, PokerLibrary",
+            "value": 13,
+            "suit": 2
+          },
+          {
+            "$type": "PokerLibrary.Models.Card, PokerLibrary",
+            "value": 6,
+            "suit": 2
+          },
+          {
+            "$type": "PokerLibrary.Models.Card, PokerLibrary",
+            "value": 8,
+            "suit": 3
+          },
+          {
+            "$type": "PokerLibrary.Models.Card, PokerLibrary",
+            "value": 3,
+            "suit": 3
+          },
+          {
+            "$type": "PokerLibrary.Models.Card, PokerLibrary",
+            "value": 4,
+            "suit": 1
+          },
+          {
+            "$type": "PokerLibrary.Models.Card, PokerLibrary",
+            "value": 11,
+            "suit": 3
+          },
+          {
+            "$type": "PokerLibrary.Models.Card, PokerLibrary",
+            "value": 11,
+            "suit": 4
+          },
+          {
+            "$type": "PokerLibrary.Models.Card, PokerLibrary",
+            "value": 9,
+            "suit": 2
+          },
+          {
+            "$type": "PokerLibrary.Models.Card, PokerLibrary",
+            "value": 5,
+            "suit": 1
+          },
+          {
+            "$type": "PokerLibrary.Models.Card, PokerLibrary",
+            "value": 5,
+            "suit": 3
+          },
+          {
+            "$type": "PokerLibrary.Models.Card, PokerLibrary",
+            "value": 14,
+            "suit": 4
+          },
+          {
+            "$type": "PokerLibrary.Models.Card, PokerLibrary",
+            "value": 6,
+            "suit": 1
+          },
+          {
+            "$type": "PokerLibrary.Models.Card, PokerLibrary",
+            "value": 9,
+            "suit": 3
+          },
+          {
+            "$type": "PokerLibrary.Models.Card, PokerLibrary",
+            "value": 3,
+            "suit": 1
+          },
+          {
+            "$type": "PokerLibrary.Models.Card, PokerLibrary",
+            "value": 11,
+            "suit": 1
+          },
+          {
+            "$type": "PokerLibrary.Models.Card, PokerLibrary",
+            "value": 12,
+            "suit": 2
+          },
+          {
+            "$type": "PokerLibrary.Models.Card, PokerLibrary",
+            "value": 10,
+            "suit": 4
+          },
+          {
+            "$type": "PokerLibrary.Models.Card, PokerLibrary",
+            "value": 13,
+            "suit": 4
+          },
+          {
+            "$type": "PokerLibrary.Models.Card, PokerLibrary",
+            "value": 4,
+            "suit": 4
+          },
+          {
+            "$type": "PokerLibrary.Models.Card, PokerLibrary",
+            "value": 8,
+            "suit": 1
+          },
+          {
+            "$type": "PokerLibrary.Models.Card, PokerLibrary",
+            "value": 5,
+            "suit": 2
+          },
+          {
+            "$type": "PokerLibrary.Models.Card, PokerLibrary",
+            "value": 9,
+            "suit": 4
+          },
+          {
+            "$type": "PokerLibrary.Models.Card, PokerLibrary",
+            "value": 13,
+            "suit": 3
+          },
+          {
+            "$type": "PokerLibrary.Models.Card, PokerLibrary",
+            "value": 13,
+            "suit": 1
+          },
+          {
+            "$type": "PokerLibrary.Models.Card, PokerLibrary",
+            "value": 3,
+            "suit": 4
+          },
+          {
+            "$type": "PokerLibrary.Models.Card, PokerLibrary",
+            "value": 12,
+            "suit": 3
+          },
+          {
+            "$type": "PokerLibrary.Models.Card, PokerLibrary",
+            "value": 3,
+            "suit": 2
+          },
+          {
+            "$type": "PokerLibrary.Models.Card, PokerLibrary",
+            "value": 6,
+            "suit": 4
+          },
+          {
+            "$type": "PokerLibrary.Models.Card, PokerLibrary",
+            "value": 10,
+            "suit": 3
+          },
+          {
+            "$type": "PokerLibrary.Models.Card, PokerLibrary",
+            "value": 2,
+            "suit": 2
+          },
+          {
+            "$type": "PokerLibrary.Models.Card, PokerLibrary",
+            "value": 11,
+            "suit": 2
+          },
+          {
+            "$type": "PokerLibrary.Models.Card, PokerLibrary",
+            "value": 8,
+            "suit": 2
+          },
+          {
+            "$type": "PokerLibrary.Models.Card, PokerLibrary",
+            "value": 12,
+            "suit": 4
+          },
+          {
+            "$type": "PokerLibrary.Models.Card, PokerLibrary",
+            "value": 14,
+            "suit": 2
+          },
+          {
+            "$type": "PokerLibrary.Models.Card, PokerLibrary",
+            "value": 7,
+            "suit": 4
+          },
+          {
+            "$type": "PokerLibrary.Models.Card, PokerLibrary",
+            "value": 6,
+            "suit": 3
+          },
+          {
+            "$type": "PokerLibrary.Models.Card, PokerLibrary",
+            "value": 2,
+            "suit": 4
+          },
+          {
+            "$type": "PokerLibrary.Models.Card, PokerLibrary",
+            "value": 2,
+            "suit": 3
+          },
+          {
+            "$type": "PokerLibrary.Models.Card, PokerLibrary",
+            "value": 9,
+            "suit": 1
+          },
+          {
+            "$type": "PokerLibrary.Models.Card, PokerLibrary",
+            "value": 5,
+            "suit": 4
+          }
+        ]
+      }
+    },
+    "Pot": 409,
+    "Players": {
+      "$type": "System.Collections.Generic.List`1[[PokerLibrary.Models.Player, PokerLibrary]], System.Private.CoreLib",
+      "$values": [
+        {
+          "$type": "PokerLibrary.Models.Player, PokerLibrary",
+          "Name": "Davide1",
+          "Email": "davidebrancato@gmail.com",
+          "Hand": {
+            "$type": "System.Collections.Generic.List`1[[PokerLibrary.Models.Card, PokerLibrary]], System.Private.CoreLib",
+            "$values": [
+              {
+                "$type": "PokerLibrary.Models.Card, PokerLibrary",
+                "value": 4,
+                "suit": 2
+              },
+              {
+                "$type": "PokerLibrary.Models.Card, PokerLibrary",
+                "value": 8,
+                "suit": 4
+              }
+            ]
+          },
+          "Chips": 20704,
+          "Bet": 19988,
+          "Move": 0,
+          "CurrentRole": 1,
+          "HandValue": 50,
+          "ChipsWon": 0,
+          "PlayersKnockedOut": 0,
+          "TablesWon": 0
+        },
+        {
+          "$type": "PokerLibrary.Models.AIPlayer, PokerLibrary",
+          "AIPersonality": 3,
+          "Name": "Vincenza",
+          "Email": "",
+          "Hand": {
+            "$type": "System.Collections.Generic.List`1[[PokerLibrary.Models.Card, PokerLibrary]], System.Private.CoreLib",
+            "$values": [
+              {
+                "$type": "PokerLibrary.Models.Card, PokerLibrary",
+                "value": 10,
+                "suit": 2
+              },
+              {
+                "$type": "PokerLibrary.Models.Card, PokerLibrary",
+                "value": 14,
+                "suit": 1
+              }
+            ]
+          },
+          "Chips": 19730,
+          "Bet": 80,
+          "Move": 2,
+          "CurrentRole": 0,
+          "HandValue": 30,
+          "ChipsWon": 0,
+          "PlayersKnockedOut": 0,
+          "TablesWon": 0
+        },
+        {
+          "$type": "PokerLibrary.Models.AIPlayer, PokerLibrary",
+          "AIPersonality": 0,
+          "Name": "Martina",
+          "Email": "",
+          "Hand": {
+            "$type": "System.Collections.Generic.List`1[[PokerLibrary.Models.Card, PokerLibrary]], System.Private.CoreLib",
+            "$values": [
+              {
+                "$type": "PokerLibrary.Models.Card, PokerLibrary",
+                "value": 14,
+                "suit": 3
+              },
+              {
+                "$type": "PokerLibrary.Models.Card, PokerLibrary",
+                "value": 7,
+                "suit": 2
+              }
+            ]
+          },
+          "Chips": 19757,
+          "Bet": 15,
+          "Move": 2,
+          "CurrentRole": 0,
+          "HandValue": 30,
+          "ChipsWon": 0,
+          "PlayersKnockedOut": 0,
+          "TablesWon": 0
+        },
+        {
+          "$type": "PokerLibrary.Models.AIPlayer, PokerLibrary",
+          "AIPersonality": 1,
+          "Name": "Martina",
+          "Email": "",
+          "Hand": {
+            "$type": "System.Collections.Generic.List`1[[PokerLibrary.Models.Card, PokerLibrary]], System.Private.CoreLib",
+            "$values": [
+              {
+                "$type": "PokerLibrary.Models.Card, PokerLibrary",
+                "value": 7,
+                "suit": 3
+              },
+              {
+                "$type": "PokerLibrary.Models.Card, PokerLibrary",
+                "value": 2,
+                "suit": 1
+              }
+            ]
+          },
+          "Chips": 19960,
+          "Bet": 10,
+          "Move": 2,
+          "CurrentRole": 0,
+          "HandValue": 30,
+          "ChipsWon": 0,
+          "PlayersKnockedOut": 0,
+          "TablesWon": 0
+        },
+        {
+          "$type": "PokerLibrary.Models.AIPlayer, PokerLibrary",
+          "AIPersonality": 3,
+          "Name": "Giuseppe",
+          "Email": "",
+          "Hand": {
+            "$type": "System.Collections.Generic.List`1[[PokerLibrary.Models.Card, PokerLibrary]], System.Private.CoreLib",
+            "$values": [
+              {
+                "$type": "PokerLibrary.Models.Card, PokerLibrary",
+                "value": 4,
+                "suit": 3
+              },
+              {
+                "$type": "PokerLibrary.Models.Card, PokerLibrary",
+                "value": 7,
+                "suit": 1
+              }
+            ]
+          },
+          "Chips": 19850,
+          "Bet": 70,
+          "Move": 3,
+          "CurrentRole": 0,
+          "HandValue": 30,
+          "ChipsWon": 0,
+          "PlayersKnockedOut": 0,
+          "TablesWon": 0
+        },
+        {
+          "$type": "PokerLibrary.Models.AIPlayer, PokerLibrary",
+          "AIPersonality": 3,
+          "Name": "Vincenza",
+          "Email": "",
+          "Hand": {
+            "$type": "System.Collections.Generic.List`1[[PokerLibrary.Models.Card, PokerLibrary]], System.Private.CoreLib",
+            "$values": [
+              {
+                "$type": "PokerLibrary.Models.Card, PokerLibrary",
+                "value": 10,
+                "suit": 1
+              },
+              {
+                "$type": "PokerLibrary.Models.Card, PokerLibrary",
+                "value": 12,
+                "suit": 1
+              }
+            ]
+          },
+          "Chips": 19590,
+          "Bet": 80,
+          "Move": 2,
+          "CurrentRole": 0,
+          "HandValue": 30,
+          "ChipsWon": 0,
+          "PlayersKnockedOut": 0,
+          "TablesWon": 0
+        }
+      ]
+    },
+    "CurrentStage": 2,
+    "Blinds": {
+      "$type": "System.Int32[], System.Private.CoreLib",
+      "$values": [
+        20,
+        104
+      ]
+    },
+    "TableCards": {
+      "$type": "System.Collections.Generic.List`1[[PokerLibrary.Models.Card, PokerLibrary]], System.Private.CoreLib",
+      "$values": []
+    },
+    "LastRoundWinner": null,
+    "Started": true
+  }
+}
